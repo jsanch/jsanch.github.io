@@ -1,7 +1,7 @@
-As far as I know, I have done everything except the polylines and displaying
-schedule data (I do show the station names).
+Google Map (w/ extra goodies), by Spencer Meldrum
 
-All work done individually (no collaborators), but I used code from Ming's
-examples.
+Things correctly implemented: Everything, to my knowledge, is implemented correctly.
 
-Spent approximately 3-4 hours on this assignment.
+Help: I got some help with the generation of map markers from kids around me in COMP20 class, Inbar Fried in particular. Also Zoe Sobin helped out with windows.
+
+Hours Spent: 10 hours
