@@ -1,0 +1,93 @@
+<html>
+<head>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
+ <link rel="stylesheet" type="text/css" href="style.css"></link>
+</head>
+<h1>Security Assessment of 2048 Gamecenter</h1>
+
+<h3>Prepared by Jaime Sanchez 4/25/2014</h3><br>
+
+
+
+<h2>Introduction</h2>
+<hr>
+<p> This assessment tests the security of http://fathomless-reaches-5908.herokuapp.com , a web application developed by Mr. Nana Kwakwa. The nature of the application is to serve as an API to recieve and display scores for the popular <a href="http://gabrielecirulli.github.io/2048/">2048</a> game that has become viral in the recent weeks.</p>
+<h2>Methodology</h2>
+<hr>
+
+<h2>Abstract of Findings </h2>
+<hr>
+<h2>Issues Found</h2>
+<hr> 
+<p> </p>
+<ol>
+	<li><p><strong>Database Overload/Overflow </strong></p></li>
+	<ul>	
+		<p>This attack consisted on a repeated post request to the server to save entries in the database, in hope of causing an overflow in the client's database. There is one caveat here though: The size of the database vs the size of the post requests. </p>
+		<li><h5>Location / page where issue was found</h5></li>
+			<p>http://fathomless-reaches-5908.herokuapp.com/submit.json</p>
+		<li><h5>Severity of issue </h5></li>
+				<p> High, this  issue poses a high cost overhead on the client. The server as it is now allows requests to be done by anyone. NO form of authentication is needed to post to the database. Also, this issue shows that the server does not handle 
+				database overload and therefore crashes the website.
+		<li><h5>Description of issue. </h5></li>
+				This attack needed a lot of time to be done as the size of the starter heroku MongoLabs database was of a considerate size, 450MB. It took around 50,000 requests of 10 kilobytes each, to bring the database to a halt, and cause heroku to raise errors. 
+		<li><h5>Proof of vulnerability. </h5></li>
+			<p> The following bash script was used to do multiple curl requests. The INPUT shown is shortened for sake of presentation. The actual request size was made up to be of 10 kylobytes poer payload. </p>
+<div class="box"><pre class="prettyprint lang-sh"><xmp>#!/bin/bash
+$INPUT = "JAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIME\
+JAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIME\
+JAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIME\
+JAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIME\
+JAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIME\
+JAIMEJAIMEJAIMEJAIMEJ..............JAIMEJAIMEJAIMEJAIMEJAIME\
+JAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIME\
+JAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIME\
+JAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIME\
+JAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIME\
+JAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIMEJAIME"
+
+for (( c=1; c<=$1 ; c++ ))
+do
+   echo "Send data x $c "
+   curl --data "username=$INPUT&score=$INPUT&grid=$INPUT"  \
+   http://fathomless-reaches-5908.herokuapp.com/submit.json
+done</xmp></pre></div>
+			<p> After many a lot , the target db started experiencing issues </p>
+			<img src="dbcrash.jpg">
+		<li><h5>Resolution. </h5></li>
+		<p> This could easily be solved by adding a layer of authentication and also a spam detector that bans an IP address that does  an x amount of requests to the server. Moreover, the client should implement a way to deal with the database getting full.  <p>
+
+	</ul>
+
+
+<li><p><strong>Cross-Origin Site Scripting / JS injection </strong></p></li>
+	<ul>	
+		<p>This attack consisted on inserting a script tag containing malicious JS code in the post request as one of it's parameters.</p>
+		<li><h5>Location / page where issue was found</h5></li>
+			<p>http://fathomless-reaches-5908.herokuapp.com/submit.json and http://fathomless-reaches-5908.herokuapp.com</p> 
+		<li><h5>Severity of issue </h5></li>
+			<p> High. This is a significant security risk. The attacker could do an array of things by injecting malicious JS to redirect to another website, to alter the funcionality of the node.js application or to even gain access to the database. </p>
+		<li><h5>Description of issue. </h5></li>
+			<p>Attack initiated through a Post request to the /submit.json route. A database entry containing js code was inserted into the server's databse using the curl POST functionality. The attack woe
+		<li><h5>Proof of vulnerability. </h5></li>
+			<p>Curl request used to insert malicious code:</p>
+			<div class="box"><pre class="prettyprint lang-sh"><xmp>curl --data "username=buajja&score=yesss&grid=<iframe src='http://omfgdogs.com'></iframe>" http://fathomless-reaches-5908.herokuapp.com/submit.json</xmp></pre></div>
+		<li><h5>Resolution. </h5></li>
+			<p> This attack was possible because of the lack of </p>
+	</ul>
+<li><p><strong>Issue 3</strong></p></li>
+	<ul>	
+		<li><h5>Location / page where issue was found</h5></li>
+		<li><h5>Severity of issue </h5></li>
+		<li><h5>Description of issue. </h5></li>
+		<li><h5>Proof of vulnerability. </h5></li>
+		<li><h5>Resolution. </h5></li>
+	</ul>
+
+
+</ol>
+<h2>Conclusion</h2>
+<hr> 
+</html>
+
+
